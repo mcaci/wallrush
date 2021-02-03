@@ -9,8 +9,11 @@ func TestGameSetupOk(t *testing.T) {
 	if g.b == nil {
 		t.Error("Board not created")
 	}
-	if len(g.c) != len(g.p) {
-		t.Errorf("Length of players, \"%d\", and their channels, \"%d\", are not the same", len(g.p), len(g.c))
+	if g.c == nil {
+		t.Error("Channel not created")
+	}
+	if len(g.p) != 1 {
+		t.Error("Players not created")
 	}
 }
 
