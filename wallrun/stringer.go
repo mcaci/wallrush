@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-
-	"github.com/mcaci/othello/wallrush/board"
-	"github.com/mcaci/othello/wallrush/char"
+	"github.com/mcaci/othello/wallrun/board"
+	"github.com/mcaci/othello/wallrun/char"
 )
 
 func (g *Game) String() string {

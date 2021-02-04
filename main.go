@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/mcaci/othello/wallrush"
+	wallrush "github.com/mcaci/othello/wallrun"
 )
 
 const (
-	n, l = 3, 4
+	n, l = 5, 10
 )
 
 func main() {
