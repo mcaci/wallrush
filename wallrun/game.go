@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gosuri/uilive"
 	"github.com/mcaci/othello/wallrun/board"
 	"github.com/mcaci/othello/wallrun/char"
 )
@@ -59,6 +60,7 @@ func Run(n, l uint8) {
 		go player(i)
 	}
 
+	clear()
 	done := make(chan struct{})
 	go Render(g, done)
 
@@ -74,7 +76,7 @@ func Start(g *Game, id int) {
 	for !board.Complete(g.b) {
 		g.c <- func() { char.Build(g.p[id], g.b) }
 		g.c <- func() { char.Move(g.p[id], char.Rand(), l) }
-		time.Sleep(250 * time.Millisecond)
+		time.Sleep(150 * time.Millisecond)
 	}
 }
 
@@ -86,15 +88,19 @@ func Finish(g *Game, done chan<- struct{}) {
 
 // Render reads the events and prints the board
 func Render(g *Game, done <-chan struct{}) {
+	t := time.NewTicker(100 * time.Millisecond)
+	writer := uilive.New()
+	writer.Start()
+	defer writer.Stop()
 	for {
 		select {
 		case act := <-g.c:
 			act()
+		case <-t.C:
+			fmt.Fprintln(writer, g)
 		case <-done:
 			return
 		}
-		clear()
-		fmt.Println(g)
 	}
 }
 
