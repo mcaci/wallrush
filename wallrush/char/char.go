@@ -69,6 +69,6 @@ func Move(c *Char, d Dir, side int) error {
 }
 
 // Build makes the character build a wall cell
-func Build(c *Char, b interface{ At(int) *board.Cell }) uint8 {
+func Build(c *Char, b *board.Board) uint8 {
 	return board.Build(b, c.pos, c.id)
 }

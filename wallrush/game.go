@@ -10,9 +10,41 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gosuri/uilive"
 	"github.com/mcaci/othello/wallrush/board"
 	"github.com/mcaci/othello/wallrush/char"
 )
+
+const (
+	n, l = 2, 8
+)
+
+// Run runs the game
+func Run() {
+	g, err := NewGame(n, l)
+	if err != nil {
+		log.Printf("error reported during the creation of the board: %v.", err)
+		log.Fatal("exiting the game.")
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(int(n))
+	player := func(i int) {
+		Start(g, i)
+		wg.Done()
+	}
+	for i := 0; i < int(n); i++ {
+		go player(i)
+	}
+
+	clear()
+	done := make(chan struct{})
+	go Render(g, done)
+
+	wg.Wait()
+	Finish(g, done)
+	RenderMap(g)
+}
 
 // Game is the main struct for the wallrush game
 type Game struct {
@@ -41,32 +73,6 @@ func NewGame(n, s uint8) (*Game, error) {
 	return &g, nil
 }
 
-// Run runs the game
-func Run(n, l uint8) {
-	g, err := NewGame(n, l)
-	if err != nil {
-		log.Printf("error reported during the creation of the board: %v.", err)
-		log.Fatal("exiting the game.")
-	}
-
-	var wg sync.WaitGroup
-	wg.Add(int(n))
-	player := func(i int) {
-		Start(g, i)
-		wg.Done()
-	}
-	for i := 0; i < int(n); i++ {
-		go player(i)
-	}
-
-	done := make(chan struct{})
-	go Render(g, done)
-
-	wg.Wait()
-	Finish(g, done)
-	RenderMap(g)
-}
-
 // Start starts the player actions.
 // It stops when the board is complete.
 func Start(g *Game, id int) {
@@ -86,15 +92,19 @@ func Finish(g *Game, done chan<- struct{}) {
 
 // Render reads the events and prints the board
 func Render(g *Game, done <-chan struct{}) {
+	t := time.NewTicker(100 * time.Millisecond)
+	writer := uilive.New()
+	writer.Start()
+	defer writer.Stop()
 	for {
 		select {
 		case act := <-g.c:
 			act()
+		case <-t.C:
+			fmt.Fprintln(writer, g)
 		case <-done:
 			return
 		}
-		clear()
-		fmt.Println(g)
 	}
 }
 

@@ -50,7 +50,7 @@ func TestFlip4Times(t *testing.T) {
 func TestOwnerChange(t *testing.T) {
 	b := NewBoard(1)
 	Build(b, 0, 1)
-	if (*b)[0].own != 1 {
+	if (*b)[0].Own() != 1 {
 		t.Errorf("%q test case failed: could not flip and change owner on a cell on a board of size %d, board is %v", "TestFlipCell", 1, b)
 	}
 }
@@ -61,7 +61,7 @@ func TestNoOwnerChangeAfterWallIsBuilt(t *testing.T) {
 		Build(b, 0, 1)
 	}
 	Build(b, 0, 2)
-	if (*b)[0].own != 1 {
+	if (*b)[0].Own() != 1 {
 		t.Errorf("%q test case failed: should not be able to flip and change owner on a fully built cell on a board of size %d, board is %v", "TestFlipCell", 1, b)
 	}
 }

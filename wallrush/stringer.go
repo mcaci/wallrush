@@ -3,10 +3,10 @@ package wallrush
 import (
 	"fmt"
 	"math"
+	"sort"
 	"strings"
 
 	"github.com/fatih/color"
-
 	"github.com/mcaci/othello/wallrush/board"
 	"github.com/mcaci/othello/wallrush/char"
 )
@@ -32,7 +32,16 @@ func (g *Game) String() string {
 	sb.WriteRune('\n')
 	// Player info
 	m := board.Count(g.b)
-	for k, v := range m {
+	sortedKeys := []int{0}
+	for k := range m {
+		if k == 0 {
+			continue
+		}
+		sortedKeys = append(sortedKeys, int(k))
+	}
+	sort.Ints(sortedKeys)
+	for i := range sortedKeys {
+		k, v := sortedKeys[i], m[(uint8(sortedKeys[i]))]
 		col := color.BlackString
 		player := fmt.Sprintf("Player %d: %d\n", k, v)
 		switch k {

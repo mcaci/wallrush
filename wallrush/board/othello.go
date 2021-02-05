@@ -1,5 +1,10 @@
 package board
 
+import (
+	"errors"
+	"math"
+)
+
 // Cell is a board cell
 type Cell struct {
 	lvl, own uint8
@@ -8,6 +13,9 @@ type Cell struct {
 func built(c *Cell) bool      { return c.lvl >= 3 }
 func inc(c *Cell)             { c.lvl++ }
 func assign(c *Cell, o uint8) { c.own = o }
+
+func (c Cell) Lvl() uint8 { return c.lvl }
+func (c Cell) Own() uint8 { return c.own }
 
 // Board is the game board
 type Board []*Cell
@@ -21,21 +29,20 @@ func NewBoard(l int) *Board {
 	return &b
 }
 
-// At returns a pointer to the Cell at index i
-func (b *Board) At(i int) *Cell {
-	return (*b)[i]
-}
+func (b *Board) Built(i int) bool { return (*b)[i].Lvl() >= 3 }
+func Side(b *Board) int           { return int(math.Sqrt(float64(len(*b)))) }
 
 // Build builds the wall cell and gives its ownership to the player who
 // did the walling, after the 3rd build action the wall is built
 // and no more direct changes are permitted on the cell
-func Build(b interface{ At(int) *Cell }, i int, o uint8) uint8 {
-	c := b.At(i)
+func Build(b *Board, i int, o uint8) uint8 {
+	c := (*b)[i]
 	if built(c) {
 		return c.lvl
 	}
 	inc(c)
 	assign(c, o)
+	Flip(b, i, o, b.Built(i))
 	return c.lvl
 }
 
@@ -56,4 +63,25 @@ func Count(b *Board) map[uint8]int {
 		m[c.own]++
 	}
 	return m
+}
+
+type BIterator struct {
+	b    *Board
+	curr int
+	inc  int
+	limF func(int) bool
+}
+
+func NewBIT(b *Board, curr int, inc int, lim func(int) bool) *BIterator {
+	return &BIterator{b: b, curr: curr, inc: inc, limF: lim}
+}
+
+var ErrEndOfLine error = errors.New("end of line reached")
+
+func (bi *BIterator) Next() (*Cell, error) {
+	if bi.limF(bi.curr) {
+		return nil, ErrEndOfLine
+	}
+	bi.curr += bi.inc
+	return (*bi.b)[bi.curr], nil
 }

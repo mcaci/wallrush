@@ -1,13 +1,9 @@
 package main
 
 import (
-	wallrush "github.com/mcaci/othello/wallrun"
-)
-
-const (
-	n, l = 5, 10
+	"github.com/mcaci/othello/wallrush"
 )
 
 func main() {
-	wallrush.Run(n, l)
+	wallrush.Run()
 }

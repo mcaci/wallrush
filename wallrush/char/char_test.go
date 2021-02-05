@@ -2,8 +2,6 @@ package char
 
 import (
 	"testing"
-
-	"github.com/mcaci/othello/wallrush/board"
 )
 
 func TestLegalMove(t *testing.T) {
@@ -91,18 +89,5 @@ func TestIllegalMove(t *testing.T) {
 		if err := Move(c, tc.direction, tc.side); err == nil {
 			t.Errorf("%q: expecting error for moving in direction %d from position %d", name, tc.direction, before)
 		}
-	}
-}
-
-type fakeBoard board.Cell
-
-func (b *fakeBoard) At(int) *board.Cell { return (*board.Cell)(b) }
-
-func TestBuildCell(t *testing.T) {
-	c := NewChar(0, 0)
-	b := fakeBoard(board.Cell{})
-	lvl := Build(c, &b)
-	if lvl != 1 {
-		t.Error("Player was not able to build")
 	}
 }
